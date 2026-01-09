@@ -46,6 +46,7 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client, logger *
 	releaseHandler := NewReleaseHandler(releaseSvc, grayReleaseSvc, auditSvc)
 	publicConfigHandler := NewPublicConfigHandler(configSvc, encryptSvc, notifySvc, auditSvc)
 	envHandler := NewEnvironmentHandler(envSvc, envDiffSvc)
+	authHandler := NewAuthHandler(db, cfg.JWT.Secret)
 
 	// 根路径 - API 信息
 	router.GET("/", func(c *gin.Context) {
@@ -160,8 +161,9 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client, logger *
 		// 用户认证
 		auth := api.Group("/auth")
 		{
-			auth.POST("/login", projectHandler.Login)
-			auth.POST("/register", projectHandler.Register)
+			auth.POST("/login", authHandler.Login)
+			auth.POST("/register", authHandler.Register)
+			auth.GET("/me", middleware.JWTAuth(cfg.JWT.Secret), authHandler.GetCurrentUser)
 		}
 	}
 }
