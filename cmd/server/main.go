@@ -13,6 +13,7 @@ import (
 	"confighub/internal/config"
 	"confighub/internal/database"
 	"confighub/internal/middleware"
+	"confighub/internal/model"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -36,6 +37,23 @@ func main() {
 	db, err := database.Connect(cfg.Database)
 	if err != nil {
 		logger.Fatal("Failed to connect database", zap.Error(err))
+	}
+
+	// 自动迁移数据库表
+	if err := db.AutoMigrate(
+		&model.User{},
+		&model.Project{},
+		&model.Config{},
+		&model.ConfigVersion{},
+		&model.ProjectKey{},
+		&model.Release{},
+		&model.AuditLog{},
+		&model.ProjectMember{},
+		&model.ClientConnection{},
+	); err != nil {
+		logger.Warn("Failed to auto migrate database", zap.Error(err))
+	} else {
+		logger.Info("Database auto migration completed")
 	}
 
 	// 连接 Redis
