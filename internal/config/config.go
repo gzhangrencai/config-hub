@@ -40,6 +40,7 @@ type RedisConfig struct {
 	Addr     string `mapstructure:"addr"`
 	Password string `mapstructure:"password"`
 	DB       int    `mapstructure:"db"`
+	TLS      bool   `mapstructure:"tls"` // 是否启用 TLS
 }
 
 // JWTConfig JWT 配置
@@ -106,13 +107,31 @@ func overrideFromEnv() {
 			dbDriver = "mysql"
 		}
 
+		// 检查是否需要 TLS (通过 DB_TLS 环境变量或自动检测 TiDB Cloud)
+		dbTLS := os.Getenv("DB_TLS")
+		if dbTLS == "" {
+			// 自动检测 TiDB Cloud (域名包含 tidbcloud.com)
+			if strings.Contains(dbHost, "tidbcloud.com") {
+				dbTLS = "true"
+			}
+		}
+
 		var dsn string
 		if dbDriver == "postgres" {
-			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-				dbHost, dbPort, dbUser, dbPassword, dbName)
+			sslMode := "disable"
+			if dbTLS == "true" {
+				sslMode = "require"
+			}
+			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+				dbHost, dbPort, dbUser, dbPassword, dbName, sslMode)
 		} else {
-			dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-				dbUser, dbPassword, dbHost, dbPort, dbName)
+			// MySQL DSN
+			tlsParam := ""
+			if dbTLS == "true" {
+				tlsParam = "&tls=true"
+			}
+			dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local%s",
+				dbUser, dbPassword, dbHost, dbPort, dbName, tlsParam)
 		}
 		viper.Set("database.dsn", dsn)
 		viper.Set("database.driver", dbDriver)
@@ -131,10 +150,19 @@ func overrideFromEnv() {
 				redisPort = "6379"
 			}
 			viper.Set("redis.addr", fmt.Sprintf("%s:%s", redisHost, redisPort))
+			
+			// 自动检测 Upstash Redis (域名包含 upstash.io)
+			if strings.Contains(redisHost, "upstash.io") {
+				viper.Set("redis.tls", true)
+			}
 		}
 	}
 	if redisPassword := os.Getenv("REDIS_PASSWORD"); redisPassword != "" {
 		viper.Set("redis.password", redisPassword)
+	}
+	// 支持 REDIS_TLS 环境变量
+	if redisTLS := os.Getenv("REDIS_TLS"); redisTLS == "true" {
+		viper.Set("redis.tls", true)
 	}
 
 	// JWT 配置
