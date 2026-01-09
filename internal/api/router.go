@@ -47,6 +47,20 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client, logger *
 	publicConfigHandler := NewPublicConfigHandler(configSvc, encryptSvc, notifySvc, auditSvc)
 	envHandler := NewEnvironmentHandler(envSvc, envDiffSvc)
 
+	// 根路径 - API 信息
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"service": "ConfigHub",
+			"version": "1.0.0",
+			"status":  "running",
+			"endpoints": gin.H{
+				"health":   "/health",
+				"api":      "/api/v1",
+				"docs":     "https://github.com/gzhangrencai/config-hub",
+			},
+		})
+	})
+
 	// 健康检查
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
