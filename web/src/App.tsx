@@ -17,8 +17,11 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 }
 
 function App() {
+  // GitHub Pages 部署在子路径下，需要设置 basename
+  const basename = import.meta.env.BASE_URL || '/'
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route
