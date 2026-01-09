@@ -3,7 +3,7 @@ FROM node:18-alpine AS frontend-builder
 
 WORKDIR /app/web
 COPY web/package*.json ./
-RUN npm ci
+RUN npm install
 COPY web/ ./
 RUN npm run build
 
@@ -13,10 +13,10 @@ FROM golang:1.21-alpine AS backend-builder
 RUN apk add --no-cache git
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
-
+COPY go.mod go.sum* ./
+RUN go mod download || true
 COPY . .
+RUN go mod tidy
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o confighub ./cmd/server
 
 # 最终镜像
