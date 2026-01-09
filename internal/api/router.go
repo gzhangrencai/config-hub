@@ -51,6 +51,9 @@ func RegisterRoutes(router *gin.Engine, db *gorm.DB, rdb *redis.Client, logger *
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
+	router.GET("/api/v1/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok", "service": "confighub"})
+	})
 
 	// API v1 - 公开配置接口 (客户端使用)
 	v1 := router.Group("/api/v1")

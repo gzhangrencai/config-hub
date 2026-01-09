@@ -5,6 +5,8 @@
 ![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?logo=go)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg)
 
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/confighub?referralCode=confighub)
+
 ConfigHub 是一个现代化的配置管理平台，类似于 Apollo/Nacos，提供配置的集中管理、版本控制、灰度发布等功能。
 
 ## ✨ 特性
@@ -169,6 +171,63 @@ confighub/
 ## 🤝 贡献
 
 欢迎提交 Issue 和 Pull Request！
+
+## ☁️ 云平台部署
+
+### Railway 一键部署 (推荐)
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/gzhangrencai/config-hub)
+
+Railway 提供免费额度，支持 Docker、MySQL、Redis，非常适合部署 ConfigHub。
+
+**部署步骤：**
+
+1. 点击上方 "Deploy on Railway" 按钮
+2. 登录/注册 Railway 账号
+3. 创建新项目，添加以下服务：
+   - **MySQL** - 从 Railway 模板添加
+   - **Redis** - 从 Railway 模板添加
+   - **ConfigHub** - 从 GitHub 仓库部署
+4. 配置环境变量（Railway 会自动注入数据库连接信息）：
+   ```
+   DB_HOST=${{MySQL.MYSQL_HOST}}
+   DB_PORT=${{MySQL.MYSQL_PORT}}
+   DB_USER=${{MySQL.MYSQL_USER}}
+   DB_PASSWORD=${{MySQL.MYSQL_PASSWORD}}
+   DB_NAME=${{MySQL.MYSQL_DATABASE}}
+   REDIS_HOST=${{Redis.REDIS_HOST}}
+   REDIS_PORT=${{Redis.REDIS_PORT}}
+   JWT_SECRET=your-secure-jwt-secret
+   ENCRYPT_KEY=your-32-byte-encryption-key!!
+   ```
+5. 部署完成后访问生成的域名
+
+### Render 部署
+
+1. 在 [Render](https://render.com) 创建账号
+2. 创建 MySQL 和 Redis 服务（或使用外部服务）
+3. 创建 Web Service，选择 Docker 部署
+4. 配置环境变量并部署
+
+### Fly.io 部署
+
+```bash
+# 安装 flyctl
+curl -L https://fly.io/install.sh | sh
+
+# 登录
+fly auth login
+
+# 创建应用
+fly launch --name confighub
+
+# 创建 MySQL 和 Redis
+fly postgres create
+fly redis create
+
+# 部署
+fly deploy
+```
 
 ## 📄 License
 

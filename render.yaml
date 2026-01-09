@@ -1,0 +1,55 @@
+# Render Blueprint - ConfigHub
+# https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: confighub
+    env: docker
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /api/v1/health
+    envVars:
+      - key: DB_HOST
+        fromService:
+          type: pserv
+          name: confighub-mysql
+          property: host
+      - key: DB_PORT
+        value: 3306
+      - key: DB_USER
+        fromService:
+          type: pserv
+          name: confighub-mysql
+          envVarKey: MYSQL_USER
+      - key: DB_PASSWORD
+        fromService:
+          type: pserv
+          name: confighub-mysql
+          envVarKey: MYSQL_PASSWORD
+      - key: DB_NAME
+        fromService:
+          type: pserv
+          name: confighub-mysql
+          envVarKey: MYSQL_DATABASE
+      - key: REDIS_HOST
+        fromService:
+          type: redis
+          name: confighub-redis
+          property: host
+      - key: REDIS_PORT
+        fromService:
+          type: redis
+          name: confighub-redis
+          property: port
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ENCRYPT_KEY
+        generateValue: true
+
+databases:
+  - name: confighub-mysql
+    databaseName: confighub
+    user: confighub
+    plan: free
+
+  - name: confighub-redis
+    plan: free

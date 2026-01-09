@@ -1,6 +1,8 @@
 package config
 
 import (
+	"fmt"
+	"os"
 	"strings"
 
 	"github.com/spf13/viper"
@@ -75,12 +77,90 @@ func Load() (*Config, error) {
 		// 配置文件不存在时使用默认值和环境变量
 	}
 
+	// 从标准环境变量构建 DSN (支持 Railway/Render/Fly.io 等平台)
+	overrideFromEnv()
+
 	var cfg Config
 	if err := viper.Unmarshal(&cfg); err != nil {
 		return nil, err
 	}
 
 	return &cfg, nil
+}
+
+// overrideFromEnv 从标准环境变量覆盖配置 (支持云平台)
+func overrideFromEnv() {
+	// 数据库配置 - 支持 DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, DB_NAME
+	dbHost := getEnv("DB_HOST", "MYSQL_HOST", "DATABASE_HOST")
+	dbPort := getEnv("DB_PORT", "MYSQL_PORT", "DATABASE_PORT")
+	dbUser := getEnv("DB_USER", "MYSQL_USER", "DATABASE_USER")
+	dbPassword := getEnv("DB_PASSWORD", "MYSQL_PASSWORD", "DATABASE_PASSWORD")
+	dbName := getEnv("DB_NAME", "MYSQL_DATABASE", "DATABASE_NAME")
+	dbDriver := getEnv("DB_DRIVER", "DATABASE_DRIVER")
+
+	if dbHost != "" && dbUser != "" && dbPassword != "" && dbName != "" {
+		if dbPort == "" {
+			dbPort = "3306"
+		}
+		if dbDriver == "" {
+			dbDriver = "mysql"
+		}
+
+		var dsn string
+		if dbDriver == "postgres" {
+			dsn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+				dbHost, dbPort, dbUser, dbPassword, dbName)
+		} else {
+			dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+				dbUser, dbPassword, dbHost, dbPort, dbName)
+		}
+		viper.Set("database.dsn", dsn)
+		viper.Set("database.driver", dbDriver)
+	}
+
+	// Redis 配置 - 支持 REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_URL
+	redisURL := os.Getenv("REDIS_URL")
+	if redisURL != "" {
+		// Railway/Render 风格的 Redis URL
+		viper.Set("redis.addr", redisURL)
+	} else {
+		redisHost := getEnv("REDIS_HOST", "REDIS_HOSTNAME")
+		redisPort := getEnv("REDIS_PORT")
+		if redisHost != "" {
+			if redisPort == "" {
+				redisPort = "6379"
+			}
+			viper.Set("redis.addr", fmt.Sprintf("%s:%s", redisHost, redisPort))
+		}
+	}
+	if redisPassword := os.Getenv("REDIS_PASSWORD"); redisPassword != "" {
+		viper.Set("redis.password", redisPassword)
+	}
+
+	// JWT 配置
+	if jwtSecret := getEnv("JWT_SECRET", "JWT_KEY"); jwtSecret != "" {
+		viper.Set("jwt.secret", jwtSecret)
+	}
+
+	// 加密密钥
+	if encryptKey := getEnv("ENCRYPT_KEY", "ENCRYPTION_KEY"); encryptKey != "" {
+		viper.Set("encrypt.key", encryptKey)
+	}
+
+	// 服务器端口 (支持 PORT 环境变量 - 云平台标准)
+	if port := os.Getenv("PORT"); port != "" {
+		viper.Set("server.addr", ":"+port)
+	}
+}
+
+// getEnv 从多个环境变量名中获取第一个非空值
+func getEnv(keys ...string) string {
+	for _, key := range keys {
+		if value := os.Getenv(key); value != "" {
+			return value
+		}
+	}
+	return ""
 }
 
 func setDefaults() {
