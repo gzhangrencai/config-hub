@@ -133,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./sdk/go
+        working-directory: ./sdk/go/confighub
 
     steps:
       - name: Checkout code
