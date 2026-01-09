@@ -1,4 +1,4 @@
-import client, { Config, ConfigVersion } from './client'
+import client, { Config, ConfigVersion, Release } from './client'
 
 export const configApi = {
   get: (id: number) =>
@@ -39,7 +39,7 @@ export const configApi = {
     client.post(`/configs/${configId}/release`, data),
 
   listReleases: (configId: number) =>
-    client.get<{ releases: Array<{ id: number; version: number; environment: string; status: string; released_at: string }> }>(
+    client.get<{ releases: Release[] }>(
       `/configs/${configId}/releases`
     ),
 

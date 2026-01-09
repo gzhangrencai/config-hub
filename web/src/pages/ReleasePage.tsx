@@ -3,12 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import {
   Card, Tabs, Button, Table, Space, Typography, Breadcrumb, Spin, Tag, Modal, Form, Select, Slider, Input, message, Popconfirm
 } from 'antd'
-import { RocketOutlined, RollbackOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { RocketOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
 import { configApi } from '../api/configs'
 import type { Config, Release } from '../api/client'
 import dayjs from 'dayjs'
 
-const { Title, Text } = Typography
+const { Text } = Typography
 
 const environments = [
   { key: 'dev', label: '开发环境' },
