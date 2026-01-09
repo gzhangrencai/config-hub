@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confighub
+  namespace: confighub
+  labels:
+    app: confighub
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: confighub
+  template:
+    metadata:
+      labels:
+        app: confighub
+    spec:
+      containers:
+        - name: confighub
+          image: confighub:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: confighub-secret
+                  key: db-password
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: confighub-secret
+                  key: jwt-secret
+            - name: ENCRYPT_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: confighub-secret
+                  key: encrypt-key
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: confighub-config

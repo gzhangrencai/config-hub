@@ -1,0 +1,67 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+confighub
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.out
+
+# Dependency directories
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config files with secrets
+config.yaml
+*.local.yaml
+
+# Logs
+*.log
+logs/
+
+# Build output
+dist/
+build/
+
+# Frontend
+web/node_modules/
+web/dist/
+web/.vite/
+
+# SDK
+sdk/go/vendor/
+sdk/nodejs/node_modules/
+sdk/nodejs/dist/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Database
+*.db
+*.sqlite
+
+# Environment
+.env
+.env.local
+.env.*.local
