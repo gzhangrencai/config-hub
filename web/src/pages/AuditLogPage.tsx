@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Table, Select, DatePicker, Space, Typography, Breadcrumb, Spin, Tag, Button } from 'antd'
+import { Card, Table, Select, DatePicker, Space, Breadcrumb, Spin, Tag, Button } from 'antd'
 import { DownloadOutlined } from '@ant-design/icons'
 import { auditApi, AuditLogQuery } from '../api/audit'
 import { projectApi } from '../api/projects'
 import type { Project, AuditLog } from '../api/client'
 import dayjs from 'dayjs'
 
-const { Title } = Typography
 const { RangePicker } = DatePicker
 
 export default function AuditLogPage() {

@@ -9,7 +9,7 @@ import { projectApi } from '../api/projects'
 import type { Project, ProjectKey } from '../api/client'
 import dayjs from 'dayjs'
 
-const { Title, Text, Paragraph } = Typography
+const { Text, Paragraph } = Typography
 
 export default function KeyManagementPage() {
   const { projectId } = useParams<{ projectId: string }>()
