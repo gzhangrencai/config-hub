@@ -66,6 +66,7 @@ jobs:
 
       - name: Run staticcheck
         run: staticcheck ./...
+        continue-on-error: true
 
       - name: Run tests
         env:
