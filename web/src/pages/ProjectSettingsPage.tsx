@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Card, Form, Input, Select, Button, Space, Typography, Breadcrumb, Spin, message, Popconfirm, Divider } from 'antd'
+import { Card, Form, Input, Select, Button, Space, Typography, Breadcrumb, Spin, message, Popconfirm } from 'antd'
 import { SaveOutlined, DeleteOutlined } from '@ant-design/icons'
 import { projectApi } from '../api/projects'
 import type { Project } from '../api/client'

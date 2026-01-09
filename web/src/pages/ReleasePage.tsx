@@ -8,7 +8,7 @@ import { configApi } from '../api/configs'
 import type { Config, Release } from '../api/client'
 import dayjs from 'dayjs'
 
-const { Text } = Typography
+const { Title, Text } = Typography
 
 const environments = [
   { key: 'dev', label: '开发环境' },

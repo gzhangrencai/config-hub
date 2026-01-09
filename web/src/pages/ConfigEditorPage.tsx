@@ -6,7 +6,7 @@ import Editor from '@monaco-editor/react'
 import { configApi } from '../api/configs'
 import type { Config } from '../api/client'
 
-const { Text } = Typography
+const { Title, Text } = Typography
 
 export default function ConfigEditorPage() {
   const { configId } = useParams<{ configId: string }>()

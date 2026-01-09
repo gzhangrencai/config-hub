@@ -7,7 +7,7 @@ import { configApi } from '../api/configs'
 import type { Config, ConfigVersion } from '../api/client'
 import dayjs from 'dayjs'
 
-const { Text } = Typography
+const { Title, Text } = Typography
 
 export default function VersionHistoryPage() {
   const { configId } = useParams<{ configId: string }>()
